@@ -1,7 +1,33 @@
 {
-	"extends": ["../../.eslintrc"],
+	"env": {
+		"node": true
+	},
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["@typescript-eslint"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
+	],
+	"rules": {
+		"comma-dangle": ["error", "always-multiline"],
+		"semi": ["error", "always"],
+		"@typescript-eslint/explicit-module-boundary-types": [
+		"error",
+		{
+			"allowArgumentsExplicitlyTypedAsAny": true
+		}
+		],
+		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/no-non-null-assertion": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-empty-function": "off",
+		"no-case-declarations": "off",
+		"@typescript-eslint/no-floating-promises": "error"
+	},
 	"parserOptions": {
-	  "project": ["./tsconfig.json"]
+		"sourceType": "module",
+		"project": ["./tsconfig.json"]
 	}
-  }
-  
+}
