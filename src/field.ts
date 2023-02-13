@@ -8,8 +8,6 @@ export const BN254ScalarField = makeField(
   5n
 );
 
-export const BabyJubjubScalarField = BN254ScalarField;
-
 export interface Field {
   numBits(): number;
   fromBytes(bytes: Uint8Array): FieldElement;
