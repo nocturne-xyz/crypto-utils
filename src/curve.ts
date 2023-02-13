@@ -3,43 +3,50 @@ import { PrimeField } from "./field";
 import { bigintToBits } from "./utils";
 
 export interface AffinePoint<FieldElement> {
-  x: FieldElement,
-  y: FieldElement,
+  x: FieldElement;
+  y: FieldElement;
 }
 
 export interface AffineCurve<FieldElement> {
-  Order: bigint,
-  PrimeSubgroupOrder: bigint,
-  Cofactor: bigint,
+  Order: bigint;
+  PrimeSubgroupOrder: bigint;
+  Cofactor: bigint;
 
-  Generator: AffinePoint<FieldElement>,
-  BasePoint: AffinePoint<FieldElement>,
-  Neutral: AffinePoint<FieldElement>,
+  Generator: AffinePoint<FieldElement>;
+  BasePoint: AffinePoint<FieldElement>;
+  Neutral: AffinePoint<FieldElement>;
 
-  eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean,
-  neq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement> ): boolean,
+  eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
+  neq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
 
-  isOnCurve(point: AffinePoint<FieldElement>): boolean,
-  isInSubgroup(point: AffinePoint<FieldElement>): boolean,
+  isOnCurve(point: AffinePoint<FieldElement>): boolean;
+  isInSubgroup(point: AffinePoint<FieldElement>): boolean;
 
-  add(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): AffinePoint<FieldElement>,
-  double(point: AffinePoint<FieldElement>): AffinePoint<FieldElement>,
-  scalarMul(point: AffinePoint<FieldElement>, scalar: bigint): AffinePoint<FieldElement>,
+  add(
+    lhs: AffinePoint<FieldElement>,
+    rhs: AffinePoint<FieldElement>
+  ): AffinePoint<FieldElement>;
+  double(point: AffinePoint<FieldElement>): AffinePoint<FieldElement>;
+  scalarMul(
+    point: AffinePoint<FieldElement>,
+    scalar: bigint
+  ): AffinePoint<FieldElement>;
 }
 
-
-export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldElement> {
+export class TwistedEdwardsCurve<FieldElement>
+  implements AffineCurve<FieldElement>
+{
   readonly BaseField: PrimeField<FieldElement>;
   readonly A: FieldElement;
   readonly D: FieldElement;
-  
+
   readonly Order: bigint;
   readonly PrimeSubgroupOrder: bigint;
   readonly Cofactor: bigint;
   readonly Generator: AffinePoint<FieldElement>;
   readonly BasePoint: AffinePoint<FieldElement>;
   readonly Neutral: AffinePoint<FieldElement>;
-  
+
   constructor(
     baseField: PrimeField<FieldElement>,
     order: bigint,
@@ -47,14 +54,17 @@ export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldEleme
     generator: AffinePoint<FieldElement>,
     basePoint: AffinePoint<FieldElement>,
     a: FieldElement,
-    d: FieldElement,
+    d: FieldElement
   ) {
     this.BaseField = baseField;
 
     this.Order = order;
     this.PrimeSubgroupOrder = order / cofactor;
     this.Cofactor = cofactor;
-    assert(cofactor * this.PrimeSubgroupOrder === order, "cofactor * primeSubgroupOrder != order");
+    assert(
+      cofactor * this.PrimeSubgroupOrder === order,
+      "cofactor * primeSubgroupOrder != order"
+    );
 
     this.Generator = generator;
     this.BasePoint = basePoint;
@@ -65,15 +75,15 @@ export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldEleme
 
     this.A = a;
     this.D = d;
-  };
+  }
 
   eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean {
     return this.BaseField.eq(lhs.x, rhs.x) && this.BaseField.eq(lhs.y, rhs.y);
-  };
+  }
 
   neq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean {
     return !this.eq(lhs, rhs);
-  };
+  }
 
   isOnCurve(point: AffinePoint<FieldElement>): boolean {
     const F = this.BaseField;
@@ -85,18 +95,22 @@ export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldEleme
 
     return !F.eq(
       F.add(F.mul(exports.A, xSquared), ySquared),
-      F.add(F.One, F.product(xSquared, ySquared, this.D)));
-  };
+      F.add(F.One, F.product(xSquared, ySquared, this.D))
+    );
+  }
 
   isInSubgroup(point: AffinePoint<FieldElement>): boolean {
     if (!this.isOnCurve(point)) return false;
 
     const shouldBeNeutral = this.scalarMul(point, this.PrimeSubgroupOrder);
     return this.eq(shouldBeNeutral, this.Neutral);
-  };
+  }
 
   // using formula from https://en.wikipedia.org/wiki/Twisted_Edwards_curve
-  add(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): AffinePoint<FieldElement> {
+  add(
+    lhs: AffinePoint<FieldElement>,
+    rhs: AffinePoint<FieldElement>
+  ): AffinePoint<FieldElement> {
     const F = this.BaseField;
 
     const { x: x1, y: y1 } = lhs;
@@ -115,7 +129,7 @@ export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldEleme
     const y = F.div(yNum, yDenom);
 
     return { x, y };
-  };
+  }
 
   // using formula from https://en.wikipedia.org/wiki/Twisted_Edwards_curve
   double(point: AffinePoint<FieldElement>): AffinePoint<FieldElement> {
@@ -135,11 +149,14 @@ export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldEleme
     const yNew = F.div(yNum, yDenom);
 
     return { x: xNew, y: yNew };
-  };
+  }
 
   // naive double-and-add method
   // optimize later if needed
-  scalarMul(point: AffinePoint<FieldElement>, scalar: bigint): AffinePoint<FieldElement> {
+  scalarMul(
+    point: AffinePoint<FieldElement>,
+    scalar: bigint
+  ): AffinePoint<FieldElement> {
     const scalarBits = bigintToBits(scalar);
 
     let res = this.Neutral;
@@ -152,6 +169,6 @@ export class TwistedEdwardsCurve<FieldElement> implements AffineCurve<FieldEleme
       scalar >>= 1n;
     }
 
-    return res;  
-  };
+    return res;
+  }
 }

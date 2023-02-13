@@ -1,4 +1,3 @@
-
 export { PrimeField } from "./field";
 export { AffinePoint, AffineCurve } from "./curve";
 

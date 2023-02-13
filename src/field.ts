@@ -1,11 +1,11 @@
 import { bigintToBits, uint8ArrayToHex } from "./utils";
 
 export interface PrimeField<FieldElement> {
-  NumBits: number
+  NumBits: number;
   Modulus: FieldElement;
   Zero: FieldElement;
   One: FieldElement;
-  Two: FieldElement
+  Two: FieldElement;
 
   fromBytes(bytes: Uint8Array): FieldElement;
   reduce(lhs: FieldElement): FieldElement;
@@ -46,11 +46,7 @@ export class ZModPField implements PrimeField<bigint> {
   private readonly twoAdicSubgroupOrder: bigint;
   private readonly twoAdicSubgroupCofactor: bigint;
 
-  constructor(
-    modulus: bigint,
-    twoAdicity: bigint,
-    nonQR: bigint,
-  ) {
+  constructor(modulus: bigint, twoAdicity: bigint, nonQR: bigint) {
     this.Modulus = modulus;
     this.NumBits = modulus.toString(2).length;
     this.nonQR = nonQR;
@@ -64,24 +60,24 @@ export class ZModPField implements PrimeField<bigint> {
     this.Two = 2n;
   }
 
-  numBits(): number{
+  numBits(): number {
     return this.Modulus.toString(2).length;
-  };
+  }
 
   fromBytes(bytes: Uint8Array): bigint {
     const nonCanonical = BigInt("0x" + uint8ArrayToHex(bytes));
     return this.reduce(nonCanonical);
-  };
+  }
 
   reduce(lhs: bigint): bigint {
     return lhs % this.Modulus;
-  };
+  }
 
   add(lhs: bigint, rhs: bigint): bigint {
     const sum = lhs + rhs;
     const sumOverflow = sum - this.Modulus;
     return sum >= this.Modulus ? sumOverflow : sum;
-  };
+  }
 
   sub(lhs: bigint, rhs: bigint): bigint {
     if (lhs >= rhs) {
@@ -89,35 +85,35 @@ export class ZModPField implements PrimeField<bigint> {
     } else {
       return this.Modulus - rhs + lhs;
     }
-  };
+  }
 
   neg(lhs: bigint): bigint {
     return lhs === 0n ? 0n : this.Modulus - lhs;
-  };
+  }
 
   mul(lhs: bigint, rhs: bigint): bigint {
     return (lhs * rhs) % this.Modulus;
-  };
+  }
 
   square(lhs: bigint): bigint {
     return (lhs * lhs) % this.Modulus;
-  };
+  }
 
   eq(lhs: bigint, rhs: bigint): boolean {
     return lhs === rhs;
-  };
+  }
 
   neq(lhs: bigint, rhs: bigint): boolean {
     return lhs !== rhs;
-  };
+  }
 
   div(lhs: bigint, rhs: bigint): bigint {
     return (lhs * this.inv(rhs)) % this.Modulus;
-  };
+  }
 
   divOrZero(lhs: bigint, rhs: bigint): bigint {
     return (lhs * this.invOrZero(rhs)) % this.Modulus;
-  };
+  }
 
   inv(lhs: bigint): bigint {
     if (lhs === 0n) {
@@ -125,7 +121,7 @@ export class ZModPField implements PrimeField<bigint> {
     }
 
     return this.invOrZero(lhs);
-  };
+  }
 
   invOrZero(lhs: bigint): bigint {
     if (lhs === 0n) {
@@ -145,15 +141,15 @@ export class ZModPField implements PrimeField<bigint> {
     if (t < 0n) t += this.Modulus;
 
     return t;
-  };
+  }
 
   product(...elements: bigint[]): bigint {
     return elements.reduce((acc, el) => this.mul(acc, el), 1n);
-  };
+  }
 
   sum(...elements: bigint[]): bigint {
     return elements.reduce((acc, el) => this.add(acc, el), 0n);
-  };
+  }
 
   dotProduct(lhs: bigint[], rhs: bigint[]): bigint {
     if (lhs.length !== rhs.length) {
@@ -161,7 +157,7 @@ export class ZModPField implements PrimeField<bigint> {
     }
 
     return lhs.reduce((acc, el, i) => this.add(acc, this.mul(el, rhs[i])), 0n);
-  };
+  }
 
   pow(base: bigint, exp: bigint): bigint {
     const exponentBits = bigintToBits(exp);
@@ -175,7 +171,7 @@ export class ZModPField implements PrimeField<bigint> {
     }
 
     return res;
-  };
+  }
 
   sqrt(lhs: bigint): bigint | undefined {
     const legendre = this.legendreSymbol(lhs);
@@ -210,7 +206,7 @@ export class ZModPField implements PrimeField<bigint> {
           // since we already chcked legende symbol, it's guaranteed to be one
           if (i >= m) throw new Error("unreachable - i >= m");
 
-          const b = this.pow(c, this.pow(2n, (this.sub(this.sub(m, i), 1n))));
+          const b = this.pow(c, this.pow(2n, this.sub(this.sub(m, i), 1n)));
           m = i;
           c = this.square(b);
           t = this.mul(t, c);
@@ -221,9 +217,9 @@ export class ZModPField implements PrimeField<bigint> {
           `unreachable - Invalid legendre symbol ${legendre} (did you set the correct field parameters?)`
         );
     }
-  };
+  }
 
   legendreSymbol(lhs: bigint): bigint {
     return this.pow(lhs, (this.Modulus - 1n) / 2n);
-  };
+  }
 }

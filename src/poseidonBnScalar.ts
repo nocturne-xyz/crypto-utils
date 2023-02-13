@@ -1,4 +1,4 @@
-import { BN254ScalarField as F} from "./fields";
+import { BN254ScalarField as F } from "./fields";
 import constants from "./poseidonBnScalarConsts.json";
 import { assert } from "./utils";
 

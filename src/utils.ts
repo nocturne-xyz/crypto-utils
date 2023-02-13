@@ -3,7 +3,9 @@ export function assert(cond: boolean, msg?: string): void {
 }
 
 export function uint8ArrayToHex(buf: Uint8Array): string {
-  return Array.from(buf).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(buf)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 export function bigintToBits(value: bigint): boolean[] {
@@ -14,4 +16,4 @@ export function bigintToBits(value: bigint): boolean[] {
   }
 
   return bits;
-};
+}
