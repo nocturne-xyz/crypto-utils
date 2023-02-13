@@ -23,7 +23,7 @@ const N_ROUNDS_P = [
 
 const pow5 = (a: bigint) => F.mul(a, F.square(F.square(a)));
 
-export function poseidon(inputs: bigint[]): bigint {
+export function poseidonBN(inputs: bigint[]): bigint {
   assert(inputs.length > 0);
   assert(inputs.length <= N_ROUNDS_P.length);
 
