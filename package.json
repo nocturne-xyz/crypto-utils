@@ -1,11 +1,9 @@
 {
   "name": "@nocturne-xyz/circomlibts",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "engines": {
-    "node": "18.12.1"
-  },
   "files": [
     "dist/**/*",
     "src/**/*"

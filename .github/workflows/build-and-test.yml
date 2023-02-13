@@ -1,0 +1,25 @@
+name: Build and Test
+on: [push]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+      - name: Enable Corepack
+        run: corepack enable
+      - name: yarn install
+        run: |
+          yarn install --immutable
+      - name: Yarn lint
+        run: |
+          yarn lint
+      - name: yarn prettier
+        run: |
+          yarn prettier:check
+      - name: yarn build
+        run: |
+          yarn build
+      - name: yarn test
+        run: |

@@ -30,7 +30,7 @@ describe("BabyJubJub", () => {
   it("BasePoint matches circomlibjs", () => {
     expect(BabyJubJub.BasePoint.x).to.equal(babyjub.Base8[0]);
     expect(BabyJubJub.BasePoint.y).to.equal(babyjub.Base8[1]);
-  })
+  });
 
   it("A matches circomlibjs", () => {
     expect(BabyJubJub.A).to.equal(babyjub.A);
