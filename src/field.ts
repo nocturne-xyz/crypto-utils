@@ -1,3 +1,4 @@
+import { assert } from "console";
 import { bigintToBits, uint8ArrayToHex } from "./utils";
 
 export interface PrimeField<FieldElement> {
@@ -116,10 +117,7 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   inv(lhs: bigint): bigint {
-    if (lhs === 0n) {
-      throw new Error("Division by zero");
-    }
-
+    assert(lhs !== 0n, "Division by zero");
     return this.invOrZero(lhs);
   }
 
@@ -204,7 +202,7 @@ export class ZModPField implements PrimeField<bigint> {
 
           // i is guaranteed to be < m if lhs is a quadratic residue.
           // since we already chcked legende symbol, it's guaranteed to be one
-          if (i >= m) throw new Error("unreachable - i >= m");
+          assert(i >= m, "unreachable - i >= m");
 
           const b = this.pow(c, this.pow(2n, this.sub(this.sub(m, i), 1n)));
           m = i;
