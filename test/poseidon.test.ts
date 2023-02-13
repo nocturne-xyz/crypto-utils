@@ -5,7 +5,7 @@ import { expect } from "chai";
 import { poseidon } from "circomlibjs";
 
 import { poseidonBN } from "../src/poseidonBnScalar";
-import { BN254ScalarField } from "../src/field";
+import { BN254ScalarField } from "../src/fields";
 import { randomFieldElement, range } from "./utils";
 
 describe("Poseidon", () => {

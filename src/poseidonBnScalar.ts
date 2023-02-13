@@ -1,4 +1,4 @@
-import { BN254ScalarField as F, FieldElement } from "./field";
+import { BN254ScalarField as F} from "./fields";
 import constants from "./poseidonBnScalarConsts.json";
 import { assert } from "./utils";
 
@@ -21,9 +21,9 @@ const N_ROUNDS_P = [
   56, 57, 56, 60, 60, 63, 64, 63, 60, 66, 60, 65, 70, 60, 64, 68,
 ];
 
-const pow5 = (a: FieldElement) => F.mul(a, F.square(F.square(a)));
+const pow5 = (a: bigint) => F.mul(a, F.square(F.square(a)));
 
-export function poseidonBN(inputs: FieldElement[]) {
+export function poseidonBN(inputs: bigint[]): bigint {
   assert(inputs.length > 0);
   assert(inputs.length <= N_ROUNDS_P.length);
 
@@ -34,7 +34,7 @@ export function poseidonBN(inputs: FieldElement[]) {
   const S = CONSTANTS_S[t - 2];
   const M = CONSTANTS_M[t - 2];
   const P = CONSTANTS_P[t - 2];
-  const zero = F.zero();
+  const zero = F.Zero;
 
   let state = [zero, ...inputs];
 
@@ -50,7 +50,7 @@ export function poseidonBN(inputs: FieldElement[]) {
   state = state.map((a) => pow5(a));
   state = state.map((a, i) => F.add(a, C[(nRoundsF / 2 - 1 + 1) * t + i]));
   state = state.map((_, i) =>
-    state.reduce((acc, a, j) => F.add(acc, F.mul(P[j][i], a)), F.zero())
+    state.reduce((acc, a, j) => F.add(acc, F.mul(P[j][i], a)), F.Zero)
   );
   for (let r = 0; r < nRoundsP; r++) {
     state[0] = pow5(state[0]);
