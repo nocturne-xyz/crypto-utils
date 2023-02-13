@@ -1,7 +1,9 @@
 import "mocha";
 import { expect } from "chai";
 
+//@ts-ignore
 import { poseidon } from "circomlibjs";
+
 import { poseidonBN } from "../src/poseidonBnScalar";
 import { BN254ScalarField } from "../src/field";
 import { randomFieldElement, range } from "./utils";

@@ -15,7 +15,7 @@
     "check": "tsc --noEmit",
     "clean": "rm -rf .turbo dist",
     "lint": "eslint --fix src --ext .ts",
-    "test:unit": "mocha --require ts-node/register test/** --exit",
+    "test": "mocha --require ts-node/register test/** --exit",
     "prettier:check": "prettier --check ./src ./test",
     "prettier:write": "prettier --write ./src ./test"
   },

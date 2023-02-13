@@ -1,7 +1,9 @@
 import "mocha";
 import { expect } from "chai";
 
+//@ts-ignore
 import { ZqField } from "ffjavascript";
+
 import { BN254ScalarField } from "../src/field"
 import { range, randomFieldElement } from "./utils";
 
