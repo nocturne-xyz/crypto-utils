@@ -181,7 +181,7 @@ export class ZModPField implements PrimeField<bigint> {
       case this.Modulus - 1n:
         return undefined;
       // Legendre symbol is 1 - `this.value` is a nonzero quadratic residue, sqrt exists
-      // use tonelli-shanks algorithm to compute it
+      // use the Tonelli-Shanks algorithm to compute it
       case 1n:
         let m = this.twoAdicity;
         let c = this.pow(this.nonQR, this.twoAdicSubgroupCofactor);
