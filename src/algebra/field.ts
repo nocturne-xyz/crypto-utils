@@ -1,5 +1,5 @@
 import { assert } from "console";
-import { bigintToBits, uint8ArrayToHex } from "./utils";
+import { bigintToBits, uint8ArrayToHex } from "../utils";
 
 export interface PrimeField<FieldElement> {
   NumBits: number;

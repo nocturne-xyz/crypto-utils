@@ -1,7 +1,2 @@
-export { PrimeField } from "./field";
-export { AffinePoint, AffineCurve } from "./curve";
-
-export * from "./fields";
-export * from "./curves";
-
-export { poseidonBN } from "../src/poseidonBnScalar";
+export * from "./algebra";
+export * from "./hashes";

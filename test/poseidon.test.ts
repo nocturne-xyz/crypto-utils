@@ -4,8 +4,8 @@ import { expect } from "chai";
 //@ts-ignore
 import { poseidon } from "circomlibjs";
 
-import { poseidonBN } from "../src/poseidonBnScalar";
-import { BN254ScalarField } from "../src/fields";
+import { poseidonBN } from "../src/hashes/poseidonBN";
+import { BN254ScalarField } from "../src/algebra/fields";
 import { randomFieldElement, range } from "./utils";
 
 describe("Poseidon", () => {

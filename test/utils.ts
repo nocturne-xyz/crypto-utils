@@ -1,5 +1,5 @@
 import * as crypto from "crypto";
-import { PrimeField } from "../src/field";
+import { PrimeField } from "../src/algebra/field";
 
 export function range(start: number, stop?: number, step?: number): number[] {
   if (!stop) {

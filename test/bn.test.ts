@@ -4,7 +4,7 @@ import { expect } from "chai";
 //@ts-ignore
 import { ZqField } from "ffjavascript";
 
-import { BN254ScalarField } from "../src/fields";
+import { BN254ScalarField } from "../src/algebra/fields";
 import { range, randomFieldElement } from "./utils";
 
 const p =

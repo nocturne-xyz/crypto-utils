@@ -4,8 +4,8 @@ import { expect } from "chai";
 //@ts-ignore
 import { babyjub } from "circomlibjs";
 
-import { BabyJubJub } from "../src/curves";
-import { AffinePoint } from "../src/curve";
+import { BabyJubJub } from "../src/algebra/curves";
+import { AffinePoint } from "../src/algebra/curve";
 import { randomBigintModP, range } from "./utils";
 
 function randomSubgroupPoint(): AffinePoint<bigint> {

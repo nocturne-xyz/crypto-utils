@@ -1,6 +1,6 @@
 import { assert } from "console";
 import { PrimeField } from "./field";
-import { bigintToBits } from "./utils";
+import { bigintToBits } from "../utils";
 
 export interface AffinePoint<FieldElement> {
   x: FieldElement;
