@@ -21,3 +21,9 @@ export function randomFieldElement<FieldElement>(
   const bytes = crypto.randomBytes(numBytes);
   return F.fromBytes(bytes);
 }
+
+export function randomBigintModP(p: bigint): bigint {
+  const numBytes = (p.toString(2).length + 7) / 8;
+  const bytes = crypto.randomBytes(numBytes);
+  return BigInt("0x" + bytes.toString("hex")) % p;
+}

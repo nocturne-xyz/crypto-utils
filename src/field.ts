@@ -202,7 +202,7 @@ export class ZModPField implements PrimeField<bigint> {
 
           // i is guaranteed to be < m if lhs is a quadratic residue.
           // since we already chcked legende symbol, it's guaranteed to be one
-          assert(i >= m, "unreachable - i >= m");
+          assert(i < m, "unreachable - i >= m");
 
           const b = this.pow(c, this.pow(2n, this.sub(this.sub(m, i), 1n)));
           m = i;
