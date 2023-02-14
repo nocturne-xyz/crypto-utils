@@ -25,6 +25,7 @@ export interface AffineCurve<FieldElement> {
   isOnCurve(point: AffinePoint<FieldElement>): boolean;
   isInSubgroup(point: AffinePoint<FieldElement>): boolean;
 
+  neg(point: AffinePoint<FieldElement>): AffinePoint<FieldElement>;
   add(
     lhs: AffinePoint<FieldElement>,
     rhs: AffinePoint<FieldElement>
@@ -133,6 +134,11 @@ export class TwistedEdwardsCurve<FieldElement>
 
     const shouldBeNeutral = this.scalarMul(point, this.PrimeSubgroupOrder);
     return this.eq(shouldBeNeutral, this.Neutral);
+  }
+
+  neg(point: AffinePoint<FieldElement>): AffinePoint<FieldElement> {
+    const { x, y } = point;
+    return { x, y: this.BaseField.neg(y) };
   }
 
   // using formula from https://en.wikipedia.org/wiki/Twisted_Edwards_curve
