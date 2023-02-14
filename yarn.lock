@@ -107,9 +107,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nocturne-xyz/circomlibts@workspace:.":
+"@nocturne-xyz/circuit-utils@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@nocturne-xyz/circomlibts@workspace:."
+  resolution: "@nocturne-xyz/circuit-utils@workspace:."
   dependencies:
     "@types/bn.js": ^5.1.1
     "@types/chai": ^4.3.3
