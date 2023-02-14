@@ -8,10 +8,8 @@ export interface PrimeField<FieldElement> {
   One: FieldElement;
   Two: FieldElement;
 
-  // expects "0x" prefixed hex string
-  fromHexString(hex: string): FieldElement;
-  // returns "0x" prefixed hex string
-  toHexString(element: FieldElement): string;
+  fromString(str: string): FieldElement;
+  toString(element: FieldElement): string;
 
   fromBytes(bytes: Uint8Array): FieldElement;
   toBytes(element: FieldElement): Uint8Array;
@@ -71,23 +69,26 @@ export class ZModPField implements PrimeField<bigint> {
     return this.Modulus.toString(2).length;
   }
 
-  fromHexString(hex: string): bigint {
-    const nonCanonical = BigInt(hex);
-    return this.reduce(nonCanonical);
+  fromString(str: string): bigint {
+    try {
+      return BigInt(str);
+    } catch {
+      throw new Error(`Invalid string for field element: ${str}`);
+    }
   }
 
-  toHexString(element: bigint): string {
-    return "0x" + element.toString(16).padStart(this.NumBits / 4, "0");
+  toString(element: bigint): string {
+    return element.toString();
   }
 
   fromBytes(bytes: Uint8Array): bigint {
     const hex = "0x" + uint8ArrayToUnprefixedHex(bytes);
-    return this.fromHexString(hex);
+    return BigInt(hex);
   }
 
   toBytes(element: bigint): Uint8Array {
-    const hex = this.toHexString(element);
-    return unprefixedHexToUint8Array(hex.slice(2));
+    const hex = element.toString(16);
+    return unprefixedHexToUint8Array(hex);
   }
 
   reduce(lhs: bigint): bigint {

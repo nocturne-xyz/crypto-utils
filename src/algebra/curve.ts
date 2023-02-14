@@ -16,6 +16,9 @@ export interface AffineCurve<FieldElement> {
   BasePoint: AffinePoint<FieldElement>;
   Neutral: AffinePoint<FieldElement>;
 
+  toString(point: AffinePoint<FieldElement>): string;
+  fromString(str: string): AffinePoint<FieldElement>;
+
   eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
   neq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
 
@@ -75,6 +78,28 @@ export class TwistedEdwardsCurve<FieldElement>
 
     this.A = a;
     this.D = d;
+  }
+
+  toString(point: AffinePoint<FieldElement>): string {
+    const { x, y } = point;
+    return JSON.stringify({
+      x: this.BaseField.toString(x),
+      y: this.BaseField.toString(y),
+    });
+  }
+
+  fromString(str: string): AffinePoint<FieldElement> {
+    const parsed = JSON.parse(str);
+    assert(parsed !== undefined, "invalid serialized point");
+    assert(parsed.x !== undefined, "invalid serialized point");
+    assert(parsed.y !== undefined, "invalid serialized point");
+    assert(typeof parsed.x === "string", "invalid serialized point");
+    assert(typeof parsed.y === "string", "invalid serialized point");
+
+    const x = this.BaseField.fromString(parsed.x);
+    const y = this.BaseField.fromString(parsed.y);
+
+    return { x, y };
   }
 
   eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean {
