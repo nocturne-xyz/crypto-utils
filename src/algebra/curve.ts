@@ -103,6 +103,7 @@ export class TwistedEdwardsCurve<FieldElement>
     assert(typeof parsed.x === "string", "invalid serialized point");
     assert(typeof parsed.y === "string", "invalid serialized point");
 
+    console.log("parsed", parsed);
     const x = this.BaseField.fromString(parsed.x);
     const y = this.BaseField.fromString(parsed.y);
 
@@ -130,7 +131,7 @@ export class TwistedEdwardsCurve<FieldElement>
     const ySquared = F.square(y);
 
     return !F.eq(
-      F.add(F.mul(exports.A, xSquared), ySquared),
+      F.add(F.mul(this.A, xSquared), ySquared),
       F.add(F.One, F.product(xSquared, ySquared, this.D))
     );
   }
