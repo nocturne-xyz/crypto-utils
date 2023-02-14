@@ -99,6 +99,10 @@ export class TwistedEdwardsCurve<FieldElement>
     const x = this.BaseField.fromString(parsed.x);
     const y = this.BaseField.fromString(parsed.y);
 
+    const point = { x, y };
+
+    assert(this.isOnCurve(point), "point not on curve");
+
     return { x, y };
   }
 
