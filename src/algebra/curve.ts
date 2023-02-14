@@ -8,6 +8,9 @@ export interface AffinePoint<FieldElement> {
 }
 
 export interface AffineCurve<FieldElement> {
+  BaseField: PrimeField<FieldElement>;
+  ScalarField: PrimeField<FieldElement>;
+
   Order: bigint;
   PrimeSubgroupOrder: bigint;
   Cofactor: bigint;
@@ -41,6 +44,7 @@ export class TwistedEdwardsCurve<FieldElement>
   implements AffineCurve<FieldElement>
 {
   readonly BaseField: PrimeField<FieldElement>;
+  readonly ScalarField: PrimeField<FieldElement>;
   readonly A: FieldElement;
   readonly D: FieldElement;
 
@@ -53,6 +57,7 @@ export class TwistedEdwardsCurve<FieldElement>
 
   constructor(
     baseField: PrimeField<FieldElement>,
+    scalarField: PrimeField<FieldElement>,
     order: bigint,
     cofactor: bigint,
     generator: AffinePoint<FieldElement>,
@@ -61,6 +66,7 @@ export class TwistedEdwardsCurve<FieldElement>
     d: FieldElement
   ) {
     this.BaseField = baseField;
+    this.ScalarField = scalarField;
 
     this.Order = order;
     this.PrimeSubgroupOrder = order / cofactor;
