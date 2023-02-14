@@ -92,7 +92,7 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   reduce(lhs: bigint): bigint {
-    return lhs % this.Modulus;
+    return ((lhs % this.Modulus) + this.Modulus) % this.Modulus;
   }
 
   add(lhs: bigint, rhs: bigint): bigint {
@@ -114,11 +114,11 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   mul(lhs: bigint, rhs: bigint): bigint {
-    return (lhs * rhs) % this.Modulus;
+    return this.reduce(lhs * rhs);
   }
 
   square(lhs: bigint): bigint {
-    return (lhs * lhs) % this.Modulus;
+    return this.reduce(lhs * lhs);
   }
 
   eq(lhs: bigint, rhs: bigint): boolean {
@@ -130,11 +130,11 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   div(lhs: bigint, rhs: bigint): bigint {
-    return (lhs * this.inv(rhs)) % this.Modulus;
+    return this.reduce(lhs * this.inv(rhs));
   }
 
   divOrZero(lhs: bigint, rhs: bigint): bigint {
-    return (lhs * this.invOrZero(rhs)) % this.Modulus;
+    return this.reduce(lhs * this.invOrZero(rhs));
   }
 
   inv(lhs: bigint): bigint {
