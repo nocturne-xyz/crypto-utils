@@ -1,4 +1,4 @@
-# circomlibts
+# circuit-utils
 
 > DISCLAIMER: this library is an ongoing WIP. It currently only contains a subset of circomlibjs' functionality. It hasn't been audited, so use it at your own risk.
 
