@@ -1,5 +1,5 @@
 import { assert } from "console";
-import { bigintToBits, uint8ArrayToHex } from "../utils";
+import { bigintToBits, uint8ArrayToUnprefixedHex, unprefixedHexToUint8Array } from "../utils";
 
 export interface PrimeField<FieldElement> {
   NumBits: number;
@@ -8,7 +8,13 @@ export interface PrimeField<FieldElement> {
   One: FieldElement;
   Two: FieldElement;
 
+  // expects "0x" prefixed hex string
+  fromHexString(hex: string): FieldElement;
+  // returns "0x" prefixed hex string
+  toHexString(element: FieldElement): string;
+
   fromBytes(bytes: Uint8Array): FieldElement;
+  toBytes(element: FieldElement): Uint8Array;
   reduce(lhs: FieldElement): FieldElement;
 
   eq(lhs: FieldElement, rhs: FieldElement): boolean;
@@ -65,9 +71,23 @@ export class ZModPField implements PrimeField<bigint> {
     return this.Modulus.toString(2).length;
   }
 
-  fromBytes(bytes: Uint8Array): bigint {
-    const nonCanonical = BigInt("0x" + uint8ArrayToHex(bytes));
+  fromHexString(hex: string): bigint {
+    const nonCanonical = BigInt(hex);
     return this.reduce(nonCanonical);
+  }
+
+  toHexString(element: bigint): string {
+    return "0x" + element.toString(16).padStart(this.NumBits / 4, "0");
+  }
+
+  fromBytes(bytes: Uint8Array): bigint {
+    const hex = "0x" + uint8ArrayToUnprefixedHex(bytes);
+    return this.fromHexString(hex);
+  }
+
+  toBytes(element: bigint): Uint8Array {
+    const hex = this.toHexString(element);
+    return unprefixedHexToUint8Array(hex.slice(2));
   }
 
   reduce(lhs: bigint): bigint {
