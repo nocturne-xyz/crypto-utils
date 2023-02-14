@@ -71,23 +71,23 @@ export class ZModPField implements PrimeField<bigint> {
 
   fromString(str: string): bigint {
     try {
-      return BigInt(str);
+      return this.reduce(BigInt(str));
     } catch {
       throw new Error(`Invalid string for field element: ${str}`);
     }
   }
 
   toString(element: bigint): string {
-    return element.toString();
+    return this.reduce(element).toString();
   }
 
   fromBytes(bytes: Uint8Array): bigint {
     const hex = "0x" + uint8ArrayToUnprefixedHex(bytes);
-    return BigInt(hex);
+    return this.reduce(BigInt(hex));
   }
 
   toBytes(element: bigint): Uint8Array {
-    const hex = element.toString(16);
+    const hex = this.reduce(element).toString(16);
     return unprefixedHexToUint8Array(hex);
   }
 
