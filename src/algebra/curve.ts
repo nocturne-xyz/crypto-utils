@@ -1,6 +1,5 @@
-import { assert } from "console";
 import { PrimeField } from "./field";
-import { bigintToBits } from "../utils";
+import { bigintToBits, assert } from "../utils";
 
 export interface AffinePoint<FieldElement> {
   x: FieldElement;
@@ -103,7 +102,6 @@ export class TwistedEdwardsCurve<FieldElement>
     assert(typeof parsed.x === "string", "invalid serialized point");
     assert(typeof parsed.y === "string", "invalid serialized point");
 
-    console.log("parsed", parsed);
     const x = this.BaseField.fromString(parsed.x);
     const y = this.BaseField.fromString(parsed.y);
 
@@ -130,7 +128,7 @@ export class TwistedEdwardsCurve<FieldElement>
     const xSquared = F.square(x);
     const ySquared = F.square(y);
 
-    return !F.eq(
+    return F.eq(
       F.add(F.mul(this.A, xSquared), ySquared),
       F.add(F.One, F.product(xSquared, ySquared, this.D))
     );
