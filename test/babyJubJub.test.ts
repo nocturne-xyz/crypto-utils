@@ -82,4 +82,15 @@ describe("BabyJubJub", () => {
       expect(got.y).to.equal(expected[1]);
     });
   });
+
+  it("toString matches fromString", () => {
+    range(10).forEach(() => {
+      const point = randomSubgroupPoint();
+
+      const pointString = BabyJubJub.toString(point);
+      const got = BabyJubJub.fromString(pointString);
+      expect(got.x).to.equal(point.x);
+      expect(got.y).to.equal(point.y);
+    });
+  });
 });

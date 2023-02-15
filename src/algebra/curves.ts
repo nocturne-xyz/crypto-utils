@@ -1,5 +1,5 @@
 import { AffinePoint, TwistedEdwardsCurve } from "./curve";
-import { BN254ScalarField } from "./fields";
+import { BN254ScalarField, BabyJubJubScalarField } from "./fields";
 
 const BabyJubJubGenerator: AffinePoint<bigint> = {
   x: 995203441582195749578291179787384436505546430278305826713579947235728471134n,
@@ -13,6 +13,7 @@ const BabyJubJubBasePoint: AffinePoint<bigint> = {
 
 export const BabyJubJub = new TwistedEdwardsCurve(
   BN254ScalarField,
+  BabyJubJubScalarField,
   21888242871839275222246405745257275088614511777268538073601725287587578984328n,
   8n,
   BabyJubJubGenerator,

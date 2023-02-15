@@ -1,6 +1,5 @@
-import { assert } from "console";
 import { PrimeField } from "./field";
-import { bigintToBits } from "../utils";
+import { bigintToBits, assert } from "../utils";
 
 export interface AffinePoint<FieldElement> {
   x: FieldElement;
@@ -8,6 +7,9 @@ export interface AffinePoint<FieldElement> {
 }
 
 export interface AffineCurve<FieldElement> {
+  BaseField: PrimeField<FieldElement>;
+  ScalarField: PrimeField<FieldElement>;
+
   Order: bigint;
   PrimeSubgroupOrder: bigint;
   Cofactor: bigint;
@@ -16,12 +18,16 @@ export interface AffineCurve<FieldElement> {
   BasePoint: AffinePoint<FieldElement>;
   Neutral: AffinePoint<FieldElement>;
 
+  toString(point: AffinePoint<FieldElement>): string;
+  fromString(str: string): AffinePoint<FieldElement>;
+
   eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
   neq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
 
   isOnCurve(point: AffinePoint<FieldElement>): boolean;
   isInSubgroup(point: AffinePoint<FieldElement>): boolean;
 
+  neg(point: AffinePoint<FieldElement>): AffinePoint<FieldElement>;
   add(
     lhs: AffinePoint<FieldElement>,
     rhs: AffinePoint<FieldElement>
@@ -37,6 +43,7 @@ export class TwistedEdwardsCurve<FieldElement>
   implements AffineCurve<FieldElement>
 {
   readonly BaseField: PrimeField<FieldElement>;
+  readonly ScalarField: PrimeField<FieldElement>;
   readonly A: FieldElement;
   readonly D: FieldElement;
 
@@ -49,6 +56,7 @@ export class TwistedEdwardsCurve<FieldElement>
 
   constructor(
     baseField: PrimeField<FieldElement>,
+    scalarField: PrimeField<FieldElement>,
     order: bigint,
     cofactor: bigint,
     generator: AffinePoint<FieldElement>,
@@ -57,6 +65,7 @@ export class TwistedEdwardsCurve<FieldElement>
     d: FieldElement
   ) {
     this.BaseField = baseField;
+    this.ScalarField = scalarField;
 
     this.Order = order;
     this.PrimeSubgroupOrder = order / cofactor;
@@ -77,6 +86,32 @@ export class TwistedEdwardsCurve<FieldElement>
     this.D = d;
   }
 
+  toString(point: AffinePoint<FieldElement>): string {
+    const { x, y } = point;
+    return JSON.stringify({
+      x: this.BaseField.toString(x),
+      y: this.BaseField.toString(y),
+    });
+  }
+
+  fromString(str: string): AffinePoint<FieldElement> {
+    const parsed = JSON.parse(str);
+    assert(parsed !== undefined, "invalid serialized point");
+    assert(parsed.x !== undefined, "invalid serialized point");
+    assert(parsed.y !== undefined, "invalid serialized point");
+    assert(typeof parsed.x === "string", "invalid serialized point");
+    assert(typeof parsed.y === "string", "invalid serialized point");
+
+    const x = this.BaseField.fromString(parsed.x);
+    const y = this.BaseField.fromString(parsed.y);
+
+    const point = { x, y };
+
+    assert(this.isOnCurve(point), "point not on curve");
+
+    return { x, y };
+  }
+
   eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean {
     return this.BaseField.eq(lhs.x, rhs.x) && this.BaseField.eq(lhs.y, rhs.y);
   }
@@ -93,8 +128,8 @@ export class TwistedEdwardsCurve<FieldElement>
     const xSquared = F.square(x);
     const ySquared = F.square(y);
 
-    return !F.eq(
-      F.add(F.mul(exports.A, xSquared), ySquared),
+    return F.eq(
+      F.add(F.mul(this.A, xSquared), ySquared),
       F.add(F.One, F.product(xSquared, ySquared, this.D))
     );
   }
@@ -104,6 +139,11 @@ export class TwistedEdwardsCurve<FieldElement>
 
     const shouldBeNeutral = this.scalarMul(point, this.PrimeSubgroupOrder);
     return this.eq(shouldBeNeutral, this.Neutral);
+  }
+
+  neg(point: AffinePoint<FieldElement>): AffinePoint<FieldElement> {
+    const { x, y } = point;
+    return { x, y: this.BaseField.neg(y) };
   }
 
   // using formula from https://en.wikipedia.org/wiki/Twisted_Edwards_curve

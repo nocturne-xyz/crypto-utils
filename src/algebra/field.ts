@@ -1,5 +1,9 @@
-import { assert } from "console";
-import { bigintToBits, uint8ArrayToHex } from "../utils";
+import {
+  assert,
+  bigintToBits,
+  uint8ArrayToUnprefixedHex,
+  unprefixedHexToUint8Array,
+} from "../utils";
 
 export interface PrimeField<FieldElement> {
   NumBits: number;
@@ -8,7 +12,11 @@ export interface PrimeField<FieldElement> {
   One: FieldElement;
   Two: FieldElement;
 
+  fromString(str: string): FieldElement;
+  toString(element: FieldElement): string;
+
   fromBytes(bytes: Uint8Array): FieldElement;
+  toBytes(element: FieldElement): Uint8Array;
   reduce(lhs: FieldElement): FieldElement;
 
   eq(lhs: FieldElement, rhs: FieldElement): boolean;
@@ -65,13 +73,30 @@ export class ZModPField implements PrimeField<bigint> {
     return this.Modulus.toString(2).length;
   }
 
+  fromString(str: string): bigint {
+    try {
+      return this.reduce(BigInt(str));
+    } catch {
+      throw new Error(`Invalid string for field element: ${str}`);
+    }
+  }
+
+  toString(element: bigint): string {
+    return this.reduce(element).toString();
+  }
+
   fromBytes(bytes: Uint8Array): bigint {
-    const nonCanonical = BigInt("0x" + uint8ArrayToHex(bytes));
-    return this.reduce(nonCanonical);
+    const hex = "0x" + uint8ArrayToUnprefixedHex(bytes);
+    return this.reduce(BigInt(hex));
+  }
+
+  toBytes(element: bigint): Uint8Array {
+    const hex = this.reduce(element).toString(16);
+    return unprefixedHexToUint8Array(hex);
   }
 
   reduce(lhs: bigint): bigint {
-    return lhs % this.Modulus;
+    return ((lhs % this.Modulus) + this.Modulus) % this.Modulus;
   }
 
   add(lhs: bigint, rhs: bigint): bigint {
@@ -93,11 +118,11 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   mul(lhs: bigint, rhs: bigint): bigint {
-    return (lhs * rhs) % this.Modulus;
+    return this.reduce(lhs * rhs);
   }
 
   square(lhs: bigint): bigint {
-    return (lhs * lhs) % this.Modulus;
+    return this.reduce(lhs * lhs);
   }
 
   eq(lhs: bigint, rhs: bigint): boolean {
@@ -109,11 +134,11 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   div(lhs: bigint, rhs: bigint): bigint {
-    return (lhs * this.inv(rhs)) % this.Modulus;
+    return this.reduce(lhs * this.inv(rhs));
   }
 
   divOrZero(lhs: bigint, rhs: bigint): bigint {
-    return (lhs * this.invOrZero(rhs)) % this.Modulus;
+    return this.reduce(lhs * this.invOrZero(rhs));
   }
 
   inv(lhs: bigint): bigint {
