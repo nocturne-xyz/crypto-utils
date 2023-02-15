@@ -1,4 +1,9 @@
-import { assert, bigintToBits, uint8ArrayToUnprefixedHex, unprefixedHexToUint8Array } from "../utils";
+import {
+  assert,
+  bigintToBits,
+  uint8ArrayToUnprefixedHex,
+  unprefixedHexToUint8Array,
+} from "../utils";
 
 export interface PrimeField<FieldElement> {
   NumBits: number;

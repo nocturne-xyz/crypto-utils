@@ -92,5 +92,5 @@ describe("BabyJubJub", () => {
       expect(got.x).to.equal(point.x);
       expect(got.y).to.equal(point.y);
     });
-  })
+  });
 });
