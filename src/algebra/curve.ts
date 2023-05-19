@@ -233,7 +233,8 @@ export class TwistedEdwardsCurve<FieldElement>
     return res;
   }
 
-  // return a if bit is 0, b otherwise
+  // return a if bit is 0, b if 1
+  // caller must ensure that bit is 0 or 1
   private sel(
     bit: number,
     a: AffinePoint<FieldElement>,
