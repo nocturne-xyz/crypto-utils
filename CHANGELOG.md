@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- add separate best-effort constant-time scalar mul
 - restructure into two sub-modules: `hashes` and `algebra`.
 - impl Baby JubJub curve using `TwistedEdwardsCurve` abstraction
 - add `TwistedEdwardsCurve` abstraction
