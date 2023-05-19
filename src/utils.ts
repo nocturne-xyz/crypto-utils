@@ -35,3 +35,13 @@ export function bigintToBits(value: bigint): boolean[] {
 
   return bits;
 }
+
+export function bigintToBitsNum(value: bigint): number[] {
+  const bits: number[] = [];
+  while (value > 0n) {
+    bits.push(Number(value & 1n));
+    value >>= 1n;
+  }
+
+  return bits;
+}

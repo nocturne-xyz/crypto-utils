@@ -13,6 +13,7 @@ export interface PrimeField<FieldElement> {
   Two: FieldElement;
 
   fromString(str: string): FieldElement;
+  fromBigint(n: bigint): FieldElement;
   toString(element: FieldElement): string;
 
   fromBytes(bytes: Uint8Array): FieldElement;
@@ -88,6 +89,10 @@ export class ZModPField implements PrimeField<bigint> {
   fromBytes(bytes: Uint8Array): bigint {
     const hex = "0x" + uint8ArrayToUnprefixedHex(bytes);
     return this.reduce(BigInt(hex));
+  }
+
+  fromBigint(n: bigint): bigint {
+    return this.reduce(n);
   }
 
   toBytes(element: bigint): Uint8Array {
