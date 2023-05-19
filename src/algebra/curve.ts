@@ -1,5 +1,5 @@
 import { PrimeField } from "./field";
-import { bigintToBits, assert } from "../utils";
+import { bigintToBits, assert, bigintToBitsNum } from "../utils";
 
 export interface AffinePoint<FieldElement> {
   x: FieldElement;
@@ -33,7 +33,12 @@ export interface AffineCurve<FieldElement> {
     rhs: AffinePoint<FieldElement>
   ): AffinePoint<FieldElement>;
   double(point: AffinePoint<FieldElement>): AffinePoint<FieldElement>;
+
   scalarMul(
+    point: AffinePoint<FieldElement>,
+    scalar: bigint
+  ): AffinePoint<FieldElement>;
+  scalarMulVartime(
     point: AffinePoint<FieldElement>,
     scalar: bigint
   ): AffinePoint<FieldElement>;
@@ -191,9 +196,27 @@ export class TwistedEdwardsCurve<FieldElement>
     return { x: xNew, y: yNew };
   }
 
-  // naive double-and-add method
-  // optimize later if needed
+  // double-always-add method from https://www.hyperelliptic.org/tanja/teaching/crypto21/ecc-8.pdf
   scalarMul(
+    point: AffinePoint<FieldElement>,
+    scalar: bigint
+  ): AffinePoint<FieldElement> {
+    const scalarBits = bigintToBitsNum(scalar);
+
+    let res = this.Neutral;
+    for (let i = scalarBits.length - 1; i >= 0; i--) {
+      res = this.double(res);
+      const q = this.add(res, point);
+
+      res = this.sel(scalarBits[i], q, res);
+    }
+
+    return res;
+  }
+
+  // double-and-add method
+  // optimize later if needed
+  scalarMulVartime(
     point: AffinePoint<FieldElement>,
     scalar: bigint
   ): AffinePoint<FieldElement> {
@@ -205,10 +228,28 @@ export class TwistedEdwardsCurve<FieldElement>
       if (scalarBits[i]) {
         res = this.add(res, point);
       }
-
-      scalar >>= 1n;
     }
 
     return res;
+  }
+
+  // return a if bit is 0, b otherwise
+  private sel(
+    bit: number,
+    a: AffinePoint<FieldElement>,
+    b: AffinePoint<FieldElement>
+  ): AffinePoint<FieldElement> {
+    const s = this.BaseField.fromBigint(BigInt(bit));
+
+    return {
+      x: this.BaseField.add(
+        this.BaseField.mul(a.x, s),
+        this.BaseField.mul(b.x, this.BaseField.sub(this.BaseField.One, s))
+      ),
+      y: this.BaseField.add(
+        this.BaseField.mul(a.y, s),
+        this.BaseField.mul(b.y, this.BaseField.sub(this.BaseField.One, s))
+      ),
+    };
   }
 }
