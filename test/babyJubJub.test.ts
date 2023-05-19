@@ -83,6 +83,21 @@ describe("BabyJubJub", () => {
     });
   });
 
+  it("scalarMulVartime matches circomlibjs", () => {
+    range(10).forEach(() => {
+      const point = randomSubgroupPoint();
+      const pointCircom = [point.x, point.y];
+
+      const scalar = randomBigintModP(BabyJubJub.PrimeSubgroupOrder);
+
+      const expected = babyjub.mulPointEscalar(pointCircom, scalar);
+      const got = BabyJubJub.scalarMulVartime(point, scalar);
+
+      expect(got.x).to.equal(expected[0]);
+      expect(got.y).to.equal(expected[1]);
+    });
+  });
+
   it("toString matches fromString", () => {
     range(10).forEach(() => {
       const point = randomSubgroupPoint();
