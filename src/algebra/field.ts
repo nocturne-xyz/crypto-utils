@@ -1,9 +1,4 @@
-import {
-  assert,
-  bigintToBits,
-  uint8ArrayToUnprefixedHex,
-  unprefixedHexToUint8Array,
-} from "../utils";
+import { assert, bigintToBits } from "../utils";
 
 export interface PrimeField<FieldElement> {
   NumBits: number;
@@ -12,12 +7,32 @@ export interface PrimeField<FieldElement> {
   One: FieldElement;
   Two: FieldElement;
 
-  fromString(str: string): FieldElement;
   fromBigint(n: bigint): FieldElement;
+
+  // function for deserializing field elements from strings
+  // this function need not be "algorithmic constant-time"
+  // this function should ensure that the resulting field element is valid and throw an error if the encoding is bad
+  fromString(str: string): FieldElement;
+
+  // function for serializing field elements to strings
+  // this function need not be "algorithmic constant-time"
   toString(element: FieldElement): string;
 
-  fromBytes(bytes: Uint8Array): FieldElement;
+  // decodes field element from a byte array in the foramt returned by `toBytes`
+  // this function should never throw errors, instead, it should return `null`
+  // this function should return `null` if `bytes` has incorrect length or the encoding is "bad"
+  // this function should be "algorithmic constat-time" for a fixed length of `bytes`
+  fromBytes(bytes: Uint8Array): FieldElement | null;
+
+  // encodes the field element to a fixed length byte array
+  // this function must return `Math.ceil(this.NumBits / 0)` bytes
+  // this function should be "algorithmic constat-time"
   toBytes(element: FieldElement): Uint8Array;
+
+  // derives a field element from the given `bytes` of entropy
+  // this function should be "algorithmic constat-time" for a fixed length of `bytes`l
+  fromEntropy(bytes: Uint8Array): FieldElement;
+
   reduce(lhs: FieldElement): FieldElement;
 
   eq(lhs: FieldElement, rhs: FieldElement): boolean;
@@ -86,9 +101,12 @@ export class ZModPField implements PrimeField<bigint> {
     return this.reduce(element).toString();
   }
 
-  fromBytes(bytes: Uint8Array): bigint {
-    const hex = "0x" + uint8ArrayToUnprefixedHex(bytes);
-    return this.reduce(BigInt(hex));
+  fromBytes(bytes: Uint8Array): bigint | null {
+    if (bytes.length !== Math.ceil(this.NumBits / 8)) {
+      return null;
+    }
+
+    return this.reduceFromLEBytes(bytes);
   }
 
   fromBigint(n: bigint): bigint {
@@ -96,8 +114,19 @@ export class ZModPField implements PrimeField<bigint> {
   }
 
   toBytes(element: bigint): Uint8Array {
-    const hex = this.reduce(element).toString(16);
-    return unprefixedHexToUint8Array(hex);
+    const numBytes = Math.ceil(this.NumBits / 8);
+    const bytes = new Uint8Array(numBytes);
+    let value = this.reduce(element);
+    for (let i = 0; i < numBytes; i++) {
+      bytes[i] = Number(value & 0xffn);
+      value >>= 8n;
+    }
+
+    return bytes;
+  }
+
+  fromEntropy(bytes: Uint8Array): bigint {
+    return this.reduceFromLEBytes(bytes);
   }
 
   reduce(lhs: bigint): bigint {
@@ -249,5 +278,13 @@ export class ZModPField implements PrimeField<bigint> {
 
   legendreSymbol(lhs: bigint): bigint {
     return this.pow(lhs, (this.Modulus - 1n) / 2n);
+  }
+
+  private reduceFromLEBytes(bytes: Uint8Array): bigint {
+    let value = 0n;
+    for (let i = 0; i < bytes.length; i++) {
+      value |= BigInt(bytes[i]) << BigInt(8 * i);
+    }
+    return this.reduce(value);
   }
 }

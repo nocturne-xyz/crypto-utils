@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import crypto from "crypto";
 import { PrimeField } from "../src/algebra/field";
 
 export function range(start: number, stop?: number, step?: number): number[] {
@@ -19,7 +19,7 @@ export function randomFieldElement<FieldElement>(
 ): FieldElement {
   const numBytes = (F.NumBits + 7) / 8;
   const bytes = crypto.randomBytes(numBytes);
-  return F.fromBytes(bytes);
+  return F.fromEntropy(bytes);
 }
 
 export function randomBigintModP(p: bigint): bigint {
