@@ -50,3 +50,6 @@ describe("HybridCipher", () => {
     );
   });
 });
+
+// TODO: test baseNonce derivation
+// destructively overwrite KEM_ID and test against known test vector(s)

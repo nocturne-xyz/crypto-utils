@@ -10,12 +10,19 @@ import {
   NONCE_LENGTH,
 } from "@stablelib/chacha20poly1305";
 import crypto from "crypto";
+import { HPKEKDF, deriveBaseNonce } from "./nonceDerivation";
 
 export interface HybridCiphertext {
-  iv: Uint8Array;
   ciphertextBytes: Uint8Array;
   encapsulatedSecretBytes: Uint8Array;
 }
+
+export const HKDFSHA256: HPKEKDF = {
+  extract: (ikm: Uint8Array, salt?: Uint8Array) =>
+    hkdf(sha256, ikm, salt, undefined, sha256.outputLen),
+  expand: (prk: Uint8Array, outputLen: number, info?: Uint8Array) =>
+    hkdf(sha256, prk, undefined, info, outputLen),
+};
 
 export class HybridCipher {
   protected curve: AffineCurve<bigint>;
@@ -77,12 +84,11 @@ export class HybridCipher {
 
     // encrypt
     const cipher = new ChaCha20Poly1305(ephemeralKey);
-    const iv = crypto.getRandomValues(new Uint8Array(NONCE_LENGTH));
-    const ciphertextBytes = cipher.seal(iv, plaintext);
+    const nonce = deriveBaseNonce(HKDFSHA256, sharedSecretBytes, NONCE_LENGTH);
+    const ciphertextBytes = cipher.seal(nonce, plaintext);
     cipher.clean();
 
     return {
-      iv,
       ciphertextBytes,
       encapsulatedSecretBytes,
     };
@@ -95,10 +101,7 @@ export class HybridCipher {
     const decryptionError = new Error("failed to decrypt");
 
     // deserialize stuff
-    const { iv, ciphertextBytes, encapsulatedSecretBytes } = ciphertext;
-    if (iv.length !== NONCE_LENGTH) {
-      throw decryptionError;
-    }
+    const { ciphertextBytes, encapsulatedSecretBytes } = ciphertext;
 
     const encapsulatedSecret = this.curve.fromBytes(encapsulatedSecretBytes);
     if (encapsulatedSecret === null) {
@@ -124,7 +127,8 @@ export class HybridCipher {
 
     // decrypt
     const cipher = new ChaCha20Poly1305(ephemeralKey);
-    const plaintext = cipher.open(iv, ciphertextBytes);
+    const nonce = deriveBaseNonce(HKDFSHA256, sharedSecretBytes, NONCE_LENGTH);
+    const plaintext = cipher.open(nonce, ciphertextBytes);
     if (plaintext === null) {
       throw decryptionError;
     }
