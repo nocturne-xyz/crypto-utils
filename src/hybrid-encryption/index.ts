@@ -2,7 +2,7 @@
 // see [TODO] for a detailed spec and security argument
 
 import { sha256 } from "@noble/hashes/sha256";
-import { hkdf } from "@noble/hashes/hkdf";
+import { expand, extract } from "@noble/hashes/hkdf";
 import { AffineCurve, AffinePoint } from "../algebra";
 import {
   ChaCha20Poly1305,
@@ -17,11 +17,11 @@ export interface HybridCiphertext {
   encapsulatedSecretBytes: Uint8Array;
 }
 
-export const HKDFSHA256: HPKEKDF = {
+export const HKDF_SHA256: HPKEKDF = {
   extract: (ikm: Uint8Array, salt?: Uint8Array) =>
-    hkdf(sha256, ikm, salt, undefined, sha256.outputLen),
+    extract(sha256, ikm, salt),
   expand: (prk: Uint8Array, outputLen: number, info?: Uint8Array) =>
-    hkdf(sha256, prk, undefined, info, outputLen),
+    expand(sha256, prk, info, outputLen),
 };
 
 export class HybridCipher {
@@ -80,11 +80,12 @@ export class HybridCipher {
     ikm.set(sharedSecretBytes, encapsulatedSecretBytes.length);
 
     // derive ephemeral encryption key from IKM
-    const ephemeralKey = hkdf(sha256, ikm, undefined, undefined, KEY_LENGTH);
+    const prk = HKDF_SHA256.extract(ikm);
+    const ephemeralKey = HKDF_SHA256.expand(prk, KEY_LENGTH);
 
     // encrypt
     const cipher = new ChaCha20Poly1305(ephemeralKey);
-    const nonce = deriveBaseNonce(HKDFSHA256, sharedSecretBytes, NONCE_LENGTH);
+    const nonce = deriveBaseNonce(HKDF_SHA256, sharedSecretBytes, NONCE_LENGTH);
     const ciphertextBytes = cipher.seal(nonce, plaintext);
     cipher.clean();
 
@@ -123,11 +124,12 @@ export class HybridCipher {
     ikm.set(sharedSecretBytes, encapsulatedSecretBytes.length);
 
     // decrive ephemeral encryption key from IKM
-    const ephemeralKey = hkdf(sha256, ikm, undefined, undefined, KEY_LENGTH);
+    const prk = HKDF_SHA256.extract(ikm);
+    const ephemeralKey = HKDF_SHA256.expand(prk, KEY_LENGTH);
 
     // decrypt
     const cipher = new ChaCha20Poly1305(ephemeralKey);
-    const nonce = deriveBaseNonce(HKDFSHA256, sharedSecretBytes, NONCE_LENGTH);
+    const nonce = deriveBaseNonce(HKDF_SHA256, sharedSecretBytes, NONCE_LENGTH);
     const plaintext = cipher.open(nonce, ciphertextBytes);
     if (plaintext === null) {
       throw decryptionError;

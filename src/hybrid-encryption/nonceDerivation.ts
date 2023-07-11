@@ -6,14 +6,14 @@ export interface HPKEKDF {
   expand(prk: Uint8Array, outputLen: number, info?: Uint8Array): Uint8Array;
 }
 
-// mode 0x01: encrypt to public key
-const MODE = i2osp(0x01n, 1);
+// mode 0x00: encrypt to public key
+export const MODE = i2osp(0x00n, 1);
 
 // b"HPKE-v1"
-const HPKE_V1_LABEL = new Uint8Array([72, 80, 75, 69, 45, 118, 49]);
+export const HPKE_V1_LABEL = new Uint8Array([72, 80, 75, 69, 45, 118, 49]);
 
 // b"HPKE"
-const HPKE_LABEL = new Uint8Array([72, 80, 75, 69, 0, 0, 0, 0, 0, 0]);
+export const HPKE_LABEL = new Uint8Array([72, 80, 75, 69]);
 
 // b"psk_id_hash"
 export const PSK_ID_HASH_LABEL = new Uint8Array([
@@ -26,7 +26,7 @@ export const INFO_HASH_LABEL = new Uint8Array([
 ]);
 
 // b"secret"
-const SECRET_LABEL = new Uint8Array([115, 101, 99, 114, 101, 116]);
+export const SECRET_LABEL = new Uint8Array([115, 101, 99, 114, 101, 116]);
 
 // b"base_nonce"
 export const BASE_NONCE_LABEL = new Uint8Array([
@@ -34,13 +34,13 @@ export const BASE_NONCE_LABEL = new Uint8Array([
 ]);
 
 // KEM using nocturne PKI (a non-spec compliant DHKEM). Not registered.
-const KEM_ID = i2osp(0xffaan, 2);
+export const KEM_ID = i2osp(0xffaan, 2);
 // HKDF using SHA256
-const KDF_ID = i2osp(0x0001n, 2);
+export const KDF_ID = i2osp(0x0001n, 2);
 // ChaCha20Poly1305
-const AEAD_ID = i2osp(0x0003n, 2);
+export const AEAD_ID = i2osp(0x0003n, 2);
 
-const SUITE_ID = new Uint8Array(
+export const SUITE_ID = new Uint8Array(
   HPKE_LABEL.length + KEM_ID.length + KDF_ID.length + AEAD_ID.length
 );
 SUITE_ID.set(HPKE_LABEL);
@@ -49,17 +49,18 @@ SUITE_ID.set(KDF_ID, HPKE_LABEL.length + KEM_ID.length);
 SUITE_ID.set(AEAD_ID, HPKE_LABEL.length + KEM_ID.length + KDF_ID.length);
 
 // all empty as we don't need them in our setting
-const PSK_ID = new Uint8Array(0);
-const PSK = new Uint8Array(0);
-const INFO = new Uint8Array(0);
+export const PSK_ID = new Uint8Array(0);
+export const PSK = new Uint8Array(0);
+export const INFO = new Uint8Array(0);
 
 export function deriveBaseNonce(
   kdf: HPKEKDF,
   sharedSecret: Uint8Array,
-  aeadNonceLen: number
+  aeadNonceLen: number,
+  info: Uint8Array = INFO,
 ): Uint8Array {
   const pskIdHash = labeledExtract(kdf, PSK_ID_HASH_LABEL, PSK_ID);
-  const infoHash = labeledExtract(kdf, INFO_HASH_LABEL, INFO);
+  const infoHash = labeledExtract(kdf, INFO_HASH_LABEL, info);
 
   // concat(mode, psk_id_hash, info_hash)
   const keyScheduleContext = new Uint8Array(
@@ -71,6 +72,8 @@ export function deriveBaseNonce(
 
   // LabeledExtract(shared_secret, "secret", psk)
   const secret = labeledExtract(kdf, SECRET_LABEL, PSK, sharedSecret);
+
+  // LabeledExpand(secret, "base_nonce", key_schedule_context, Nn)
   return labeledExpand(
     kdf,
     BASE_NONCE_LABEL,

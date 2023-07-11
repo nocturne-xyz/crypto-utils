@@ -9,11 +9,11 @@ export function uint8ArrayToUnprefixedHex(buf: Uint8Array): string {
 }
 
 export function unprefixedHexToUint8Array(hex: string): Uint8Array {
-  if (hex.length % 2) {
+  if (hex.length % 2 !== 0) {
     hex = "0" + hex;
   }
 
-  const u8 = new Uint8Array(hex.length);
+  const u8 = new Uint8Array(hex.length / 2);
 
   let i = 0;
   let j = 0;
@@ -58,7 +58,7 @@ export function i2osp(n: bigint, length: number): Uint8Array {
       "i2osp: input too large to encode into a byte array of specified length"
     );
   }
-
+ 
   const bytes = new Uint8Array(length);
 
   for (let i = length - 1; i >= 0; i--) {
