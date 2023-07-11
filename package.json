@@ -1,6 +1,6 @@
 {
   "name": "@nocturne-xyz/crypto-utils",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc --build",
     "check": "tsc --noEmit",
-    "clean": "rm -rf .turbo dist",
+    "clean": "rm -rf dist",
     "lint": "eslint --fix src --ext .ts",
     "test": "mocha --require ts-node/register test/** --exit",
     "prettier:check": "prettier --check ./src ./test",

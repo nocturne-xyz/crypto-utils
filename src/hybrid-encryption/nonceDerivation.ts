@@ -108,7 +108,7 @@ function labeledExpand(
   len: number,
   info?: Uint8Array
 ): Uint8Array {
-  if (len > 1n << (8n * 2n)) {
+  if (len > 256**2) {
     throw new Error("labeledExpand: length too large");
   }
 
