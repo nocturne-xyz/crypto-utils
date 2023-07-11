@@ -21,7 +21,7 @@ describe("HybridCipher", () => {
       BABYJUBJUB_WIDE_REDUCTION_ENTROPY
     );
 
-    const msg = "Kaizoku o ni ore wa naru!";
+    const msg = "Kaizoku ou ni ore wa naru!";
     const msgBytes = new TextEncoder().encode(msg);
 
     const receiverPrivateKey = randomBigintModP(BabyJubJub.ScalarField.Modulus);
@@ -40,7 +40,7 @@ describe("HybridCipher", () => {
       BabyJubJub,
       BABYJUBJUB_WIDE_REDUCTION_ENTROPY
     );
-    const msg = "Kaizoku o ni ore wa naru!";
+    const msg = "Kaizoku ou ni ore wa naru!";
     const msgBytes = new TextEncoder().encode(msg);
 
     const receiverPrivateKey = randomBigintModP(BabyJubJub.ScalarField.Modulus);
