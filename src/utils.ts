@@ -53,12 +53,12 @@ export function i2osp(n: bigint, length: number): Uint8Array {
     throw new Error("i2osp: input must be non-negative");
   }
 
-  if (n > 256**length) {
+  if (n > 256 ** length) {
     throw new Error(
       "i2osp: input too large to encode into a byte array of specified length"
     );
   }
- 
+
   const bytes = new Uint8Array(length);
 
   for (let i = length - 1; i >= 0; i--) {

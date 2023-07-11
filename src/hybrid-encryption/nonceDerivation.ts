@@ -57,7 +57,7 @@ export function deriveBaseNonce(
   kdf: HPKEKDF,
   sharedSecret: Uint8Array,
   aeadNonceLen: number,
-  info: Uint8Array = INFO,
+  info: Uint8Array = INFO
 ): Uint8Array {
   const pskIdHash = labeledExtract(kdf, PSK_ID_HASH_LABEL, PSK_ID);
   const infoHash = labeledExtract(kdf, INFO_HASH_LABEL, info);
@@ -108,7 +108,7 @@ function labeledExpand(
   len: number,
   info?: Uint8Array
 ): Uint8Array {
-  if (len > 256**2) {
+  if (len > 256 ** 2) {
     throw new Error("labeledExpand: length too large");
   }
 
