@@ -58,8 +58,8 @@ describe("HybridCipher", () => {
   });
 });
 
-describe("BaseNonseDerivation", () => {
-  // HACK: before running BaseNonceDerivation tests, manually overwrite KEM_ID to id of DHKEM(X25519) for tests
+describe("deriveBaseNonce", () => {
+  // HACK: before running base nonce derivation tests, manually overwrite KEM_ID to id of DHKEM(X25519) for tests
   // afterwards, put it back
   const DHKEM_X25519_ID = i2osp(0x0020n, 2);
   const KEM_ID_COPY = new Uint8Array(KEM_ID.length);
