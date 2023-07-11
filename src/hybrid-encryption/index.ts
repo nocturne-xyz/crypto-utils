@@ -1,5 +1,5 @@
-// a Nocturne-specific hybrid encryption scheme that requires the sender to prove knowledge of the ephemeral secret key
-// see [TODO] for a detailed spec and security argument
+// a Nocturne-specific hybrid encryption scheme that requires the sender to prove knowledge of the decapsulated secret
+// see [TODO] for more information
 
 import { sha256 } from "@noble/hashes/sha256";
 import { expand, extract } from "@noble/hashes/hkdf";
