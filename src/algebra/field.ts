@@ -62,7 +62,7 @@ export interface PrimeField<FieldElement> {
 
 export class ZModPField implements PrimeField<bigint> {
   readonly NumBits: number;
-  readonly NumBytes: number; 
+  readonly NumBytes: number;
   readonly Modulus: bigint;
   readonly Zero: bigint;
   readonly One: bigint;

@@ -136,7 +136,10 @@ export class HybridCipher {
     cipher.clean();
 
     // extract ephemeral secret and msg from plaintext
-    const ephemeralSecretBytes = plaintext.slice(0, this.curve.ScalarField.NumBytes);
+    const ephemeralSecretBytes = plaintext.slice(
+      0,
+      this.curve.ScalarField.NumBytes
+    );
     const msg = plaintext.slice(this.curve.ScalarField.NumBytes);
     const ephemeralSecret =
       this.curve.ScalarField.fromBytes(ephemeralSecretBytes);
