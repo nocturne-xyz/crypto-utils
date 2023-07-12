@@ -2,6 +2,7 @@ import { assert, bigintToBits } from "../utils";
 
 export interface PrimeField<FieldElement> {
   NumBits: number;
+  NumBytes: number;
   Modulus: FieldElement;
   Zero: FieldElement;
   One: FieldElement;
@@ -61,6 +62,7 @@ export interface PrimeField<FieldElement> {
 
 export class ZModPField implements PrimeField<bigint> {
   readonly NumBits: number;
+  readonly NumBytes: number; 
   readonly Modulus: bigint;
   readonly Zero: bigint;
   readonly One: bigint;
@@ -74,6 +76,7 @@ export class ZModPField implements PrimeField<bigint> {
   constructor(modulus: bigint, twoAdicity: bigint, nonQR: bigint) {
     this.Modulus = modulus;
     this.NumBits = modulus.toString(2).length;
+    this.NumBytes = Math.ceil(this.NumBits / 8);
     this.nonQR = nonQR;
 
     this.twoAdicity = twoAdicity;

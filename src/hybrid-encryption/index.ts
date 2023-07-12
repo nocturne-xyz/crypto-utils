@@ -122,7 +122,7 @@ export class HybridCipher {
     ikm.set(encapsulatedSecretBytes);
     ikm.set(sharedSecretBytes, encapsulatedSecretBytes.length);
 
-    // decrive ephemeral encryption key from IKM
+    // derive ephemeral encryption key from IKM
     const prk = HKDF_SHA256.extract(ikm);
     const ephemeralKey = HKDF_SHA256.expand(prk, KEY_LENGTH);
 
@@ -136,11 +136,8 @@ export class HybridCipher {
     cipher.clean();
 
     // extract ephemeral secret and msg from plaintext
-    const numEphemeralSecretBytes = Math.ceil(
-      this.curve.ScalarField.NumBits / 8
-    );
-    const ephemeralSecretBytes = plaintext.slice(0, numEphemeralSecretBytes);
-    const msg = plaintext.slice(numEphemeralSecretBytes);
+    const ephemeralSecretBytes = plaintext.slice(0, this.curve.ScalarField.NumBytes);
+    const msg = plaintext.slice(this.curve.ScalarField.NumBytes);
     const ephemeralSecret =
       this.curve.ScalarField.fromBytes(ephemeralSecretBytes);
     if (ephemeralSecret === null) {
