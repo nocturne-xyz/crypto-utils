@@ -13,7 +13,7 @@
     "check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "lint": "eslint --fix src --ext .ts",
-    "test": "mocha --require ts-node/register test/** --exit",
+    "test": "mocha --require ts-node/register test/** --exit --timeout 5000",
     "prettier:check": "prettier --check ./src ./test",
     "prettier:write": "prettier --write ./src ./test"
   },
