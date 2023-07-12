@@ -2,8 +2,13 @@ import "mocha";
 import { expect } from "chai";
 
 import { BabyJubJub } from "../src/algebra/curves";
-import { HKDF_SHA256, HybridCipher } from "../src/hybrid-encryption";
-import { randomBigintModP } from "./utils";
+import {
+  HKDF_SHA256,
+  HybridCipher,
+  deserializeHybridCiphertext,
+  serializeHybridCiphertext,
+} from "../src/hybrid-encryption";
+import { randomBigintModP, range } from "./utils";
 import {
   HPKE_LABEL,
   KEM_ID,
@@ -11,6 +16,7 @@ import {
   deriveBaseNonce,
 } from "../src/hybrid-encryption/nonceDerivation";
 import { i2osp, unprefixedHexToUint8Array } from "../src/utils";
+import { randomBytes } from "crypto";
 
 const BABYJUBJUB_WIDE_REDUCTION_ENTROPY = 64;
 
@@ -88,5 +94,25 @@ describe("deriveBaseNonce", () => {
     const baseNonce = deriveBaseNonce(HKDF_SHA256, sharedSecret, 12, info);
 
     expect(baseNonce).to.deep.equal(baseNonceExpected);
+  });
+});
+
+describe("serialize and deserialize", () => {
+  it("serializes and deserializes ciphertexts", () => {
+    range(0, 100).forEach(() => {
+      const ciphertextBytes = randomBytes(256);
+      const encapsulatedSecretBytes = randomBytes(
+        BabyJubJub.BaseField.NumBytes * 2
+      );
+      const ciphertext = {
+        ciphertextBytes,
+        encapsulatedSecretBytes,
+      };
+
+      const serialized = serializeHybridCiphertext(ciphertext);
+      const deserialized = deserializeHybridCiphertext(serialized);
+
+      expect(deserialized).to.deep.equal(ciphertext);
+    });
   });
 });
