@@ -17,6 +17,29 @@ export interface HybridCiphertext {
   encapsulatedSecretBytes: Uint8Array;
 }
 
+export interface SerializedHybridCiphertext {
+  ciphertextBytes: number[];
+  encapsulatedSecretBytes: number[];
+}
+
+export function serializeHybridCiphertext(
+  ciphertext: HybridCiphertext
+): SerializedHybridCiphertext {
+  return {
+    ciphertextBytes: Array.from(ciphertext.ciphertextBytes),
+    encapsulatedSecretBytes: Array.from(ciphertext.encapsulatedSecretBytes),
+  };
+}
+
+export function deserializeHybridCiphertext(
+  ciphertext: SerializedHybridCiphertext
+): HybridCiphertext {
+  return {
+    ciphertextBytes: new Uint8Array(ciphertext.ciphertextBytes),
+    encapsulatedSecretBytes: new Uint8Array(ciphertext.encapsulatedSecretBytes),
+  };
+}
+
 export const HKDF_SHA256: HPKEKDF = {
   extract: (ikm: Uint8Array, salt?: Uint8Array) => extract(sha256, ikm, salt),
   expand: (prk: Uint8Array, outputLen: number, info?: Uint8Array) =>

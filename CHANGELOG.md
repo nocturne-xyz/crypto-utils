@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- add `SerializedHybridCiphertext` and two functions for converting to/from `HybridCiphertext` to avoid with browser `Uin8Array` nonsense
 - add `NumBytes` to `PrimeField`
 - rename package to `@nocturne-xyz/crypto-utils`
 - add module `hybrid-encryption` containing a generic `HybridCipher` 
