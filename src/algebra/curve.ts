@@ -18,8 +18,25 @@ export interface AffineCurve<FieldElement> {
   BasePoint: AffinePoint<FieldElement>;
   Neutral: AffinePoint<FieldElement>;
 
+  // function for serializing points to strings
+  // this function need not be "algorithmic constant-time"
   toString(point: AffinePoint<FieldElement>): string;
+
+  // function for deserializing points from strings
+  // this function need not be "algorithmic constant-time"
+  // this function should ensure that the resulting point is valid and throw an error otherwise
   fromString(str: string): AffinePoint<FieldElement>;
+
+  // encodes the point to a fixed length byte array, formatted as the x-coordinate followed by the y-coordinate
+  // where the encoding of `x-coordinate` and `y-coordinate` is that of `BaseField.toBytes`
+  // this function should be "algorithmic constat-time" for a fixed length of `bytes`
+  toBytes(point: AffinePoint<FieldElement>): Uint8Array;
+
+  // decodes a point from a byte array in the foramt returned by `toBytes`
+  // this function should never throw errors, instead, it should return `null`
+  // this function should return null if `bytes` is of the incorrect length or if the encoding of any field element is "bad"
+  // this function should be "algorithmic constat-time"
+  fromBytes(bytes: Uint8Array): AffinePoint<FieldElement> | null;
 
   eq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
   neq(lhs: AffinePoint<FieldElement>, rhs: AffinePoint<FieldElement>): boolean;
@@ -113,6 +130,43 @@ export class TwistedEdwardsCurve<FieldElement>
     const point = { x, y };
 
     assert(this.isOnCurve(point), "point not on curve");
+
+    return { x, y };
+  }
+
+  // serializes a point to bytes as the `x` coordinate followed by the `y` coordinate
+  toBytes(point: AffinePoint<FieldElement>): Uint8Array {
+    const bytesPerFieldElement = Math.ceil(this.BaseField.NumBits / 8);
+    const { x, y } = point;
+
+    const xBytes = this.BaseField.toBytes(x);
+    const yBytes = this.BaseField.toBytes(y);
+
+    const res = new Uint8Array(2 * bytesPerFieldElement);
+    res.set(xBytes);
+    res.set(yBytes, bytesPerFieldElement);
+
+    return res;
+  }
+
+  // this function will return `null` if `bytes` is incorrect length
+  // this function
+  // this function will return `null` if the resulting point is not on the curve
+  fromBytes(bytes: Uint8Array): AffinePoint<FieldElement> | null {
+    const bytesPerFieldElement = Math.ceil(this.BaseField.NumBits / 8);
+    if (bytes.length !== 2 * bytesPerFieldElement) {
+      return null;
+    }
+
+    const xBytes = bytes.slice(0, bytesPerFieldElement);
+    const yBytes = bytes.slice(bytesPerFieldElement);
+
+    const x = this.BaseField.fromBytes(xBytes);
+    const y = this.BaseField.fromBytes(yBytes);
+
+    if (x === null || y === null || !this.isOnCurve({ x, y })) {
+      return null;
+    }
 
     return { x, y };
   }
