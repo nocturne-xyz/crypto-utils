@@ -9,7 +9,6 @@ import {
   KEY_LENGTH,
   NONCE_LENGTH,
 } from "@stablelib/chacha20poly1305";
-import crypto from "crypto";
 import { HPKEKDF, deriveBaseNonce } from "./nonceDerivation";
 
 export interface HybridCiphertext {
