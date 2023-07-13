@@ -1,5 +1,6 @@
+import "./crypto";
 import { PrimeField } from "../src/algebra/field";
-import randomBytes from "randombytes";
+import { randomBytes } from "crypto";
 
 export function range(start: number, stop?: number, step?: number): number[] {
   if (!stop) {
