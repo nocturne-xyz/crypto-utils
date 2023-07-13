@@ -1,9 +1,10 @@
 {
   "name": "@nocturne-xyz/crypto-utils",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/node.js",
+  "browser": "dist/browser.js",
+  "types": "dist/src/index.d.ts",
   "files": [
     "dist/**/*",
     "src/**/*"

@@ -1,5 +1,6 @@
 import "mocha";
 import { expect } from "chai";
+import "./crypto";
 
 import { BabyJubJub } from "../src/algebra/curves";
 import {

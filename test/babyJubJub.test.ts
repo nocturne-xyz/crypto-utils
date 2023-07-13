@@ -1,5 +1,6 @@
 import "mocha";
 import { expect } from "chai";
+import "./crypto";
 
 //@ts-ignore
 import { babyjub } from "circomlibjs";
