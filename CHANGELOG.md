@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- add `NumBits` and `NumBytes` to `AffineCurve`
 - expose separate entrpoints for browser and node
 - add `SerializedHybridCiphertext` and two functions for converting to/from `HybridCiphertext` to avoid with browser `Uin8Array` nonsense
 - add `NumBytes` to `PrimeField`

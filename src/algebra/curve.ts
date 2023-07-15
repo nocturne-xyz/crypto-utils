@@ -14,6 +14,9 @@ export interface AffineCurve<FieldElement> {
   PrimeSubgroupOrder: bigint;
   Cofactor: bigint;
 
+  NumBits: number;
+  NumBytes: number;
+
   Generator: AffinePoint<FieldElement>;
   BasePoint: AffinePoint<FieldElement>;
   Neutral: AffinePoint<FieldElement>;
@@ -76,6 +79,9 @@ export class TwistedEdwardsCurve<FieldElement>
   readonly BasePoint: AffinePoint<FieldElement>;
   readonly Neutral: AffinePoint<FieldElement>;
 
+  NumBits: number;
+  NumBytes: number;
+
   constructor(
     baseField: PrimeField<FieldElement>,
     scalarField: PrimeField<FieldElement>,
@@ -106,6 +112,9 @@ export class TwistedEdwardsCurve<FieldElement>
 
     this.A = a;
     this.D = d;
+
+    this.NumBits = this.BaseField.NumBits * 2;
+    this.NumBytes = Math.ceil(this.NumBits / 8);
   }
 
   toString(point: AffinePoint<FieldElement>): string {
