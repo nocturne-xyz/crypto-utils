@@ -14,6 +14,9 @@ export interface AffineCurve<FieldElement> {
   PrimeSubgroupOrder: bigint;
   Cofactor: bigint;
 
+  NumBits: number;
+  NumBytes: number;
+
   Generator: AffinePoint<FieldElement>;
   BasePoint: AffinePoint<FieldElement>;
   Neutral: AffinePoint<FieldElement>;
@@ -76,6 +79,9 @@ export class TwistedEdwardsCurve<FieldElement>
   readonly BasePoint: AffinePoint<FieldElement>;
   readonly Neutral: AffinePoint<FieldElement>;
 
+  NumBits: number;
+  NumBytes: number;
+
   constructor(
     baseField: PrimeField<FieldElement>,
     scalarField: PrimeField<FieldElement>,
@@ -106,6 +112,9 @@ export class TwistedEdwardsCurve<FieldElement>
 
     this.A = a;
     this.D = d;
+
+    this.NumBits = this.BaseField.NumBits * 2;
+    this.NumBytes = Math.ceil(this.NumBits / 8);
   }
 
   toString(point: AffinePoint<FieldElement>): string {
@@ -136,15 +145,14 @@ export class TwistedEdwardsCurve<FieldElement>
 
   // serializes a point to bytes as the `x` coordinate followed by the `y` coordinate
   toBytes(point: AffinePoint<FieldElement>): Uint8Array {
-    const bytesPerFieldElement = Math.ceil(this.BaseField.NumBits / 8);
     const { x, y } = point;
 
     const xBytes = this.BaseField.toBytes(x);
     const yBytes = this.BaseField.toBytes(y);
 
-    const res = new Uint8Array(2 * bytesPerFieldElement);
+    const res = new Uint8Array(this.NumBytes);
     res.set(xBytes);
-    res.set(yBytes, bytesPerFieldElement);
+    res.set(yBytes, xBytes.length);
 
     return res;
   }
@@ -153,13 +161,12 @@ export class TwistedEdwardsCurve<FieldElement>
   // this function
   // this function will return `null` if the resulting point is not on the curve
   fromBytes(bytes: Uint8Array): AffinePoint<FieldElement> | null {
-    const bytesPerFieldElement = Math.ceil(this.BaseField.NumBits / 8);
-    if (bytes.length !== 2 * bytesPerFieldElement) {
+    if (bytes.length !== this.NumBytes) {
       return null;
     }
 
-    const xBytes = bytes.slice(0, bytesPerFieldElement);
-    const yBytes = bytes.slice(bytesPerFieldElement);
+    const xBytes = bytes.slice(0, this.BaseField.NumBytes);
+    const yBytes = bytes.slice(this.BaseField.NumBytes);
 
     const x = this.BaseField.fromBytes(xBytes);
     const y = this.BaseField.fromBytes(yBytes);
