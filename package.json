@@ -1,6 +1,6 @@
 {
   "name": "@nocturne-xyz/crypto-utils",
-  "version": "0.1.7",
+  "version": "0.1.8-beta",
   "license": "MIT",
   "main": "dist/node.js",
   "browser": "dist/browser.js",
